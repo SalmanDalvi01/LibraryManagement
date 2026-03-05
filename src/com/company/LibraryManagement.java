@@ -36,59 +36,52 @@ class LibraryInventory
             System.out.println("Choice: ");
 
             choice = sc.nextInt();
+            sc.nextLine();
 
-            if(!sc.hasNextInt())
+            int starting_index = 0; // Start adding new books from index 5
+            int slot_count = 0;
+
+            for (int i = 0; i < book.length; i++)
             {
-                System.out.println("Please enter only numbers.");
-                sc.nextLine();
+                if(book[i] == null)
+                {
+                    starting_index = i;
+                    break;
+                }
             }
-            else
-            {
-                int starting_index = 0; // Start adding new books from index 5
-                int slot_count = 0;
 
-                for (int i = 0; i < book.length; i++)
+            if(choice == 1)
+            {
+                // Count how many empty slots are available for new books
+                for (int i = starting_index; i < book.length; i++)
                 {
                     if(book[i] == null)
                     {
-                        starting_index = i;
-                        break;
+                        slot_count +=1;
                     }
                 }
+                addBook(book,slot_count); // Call method to add books
+            }
+            else if (choice == 2)
+            {
+                showAvailableBook(book); // Display all books currently in the library
+            }
+            else if(choice == 3)
+            {
+                l.IssueBook(issueBook,book,issueIndex);
+            }
+            else if(choice == 4)
+            {
 
-                if(choice == 1)
-                {
-                    // Count how many empty slots are available for new books
-                    for (int i = starting_index; i < book.length; i++)
-                    {
-                        if(book[i] == null)
-                        {
-                            slot_count +=1;
-                        }
-                    }
-                    addBook(book,slot_count); // Call method to add books
-                }
-                else if (choice == 2)
-                {
-                    showAvailableBook(book); // Display all books currently in the library
-                }
-                else if(choice == 3)
-                {
-                    l.IssueBook(issueBook,book,issueIndex);
-                }
-                else if(choice == 4)
-                {
-
-                    l.issuedBook(issueBook);
-                }
-                else if(choice == 5)
-                {
-                    l.returnBook(book,issueBook,issueIndex);
-                }
-                else if(choice == 6)
-                {
-                    System.out.println("Exiting Library... Thank You!");
-                }
+                l.issuedBook(issueBook);
+            }
+            else if(choice == 5)
+            {
+                l.returnBook(book,issueBook,issueIndex);
+            }
+            else if(choice == 6)
+            {
+                System.out.println("Exiting Library... Thank You!");
             }
         }
     }
@@ -116,33 +109,22 @@ class LibraryInventory
             while(!invalidInput)
             {
                 System.out.println("How Many Book You Want To Add:- ");
+                BookAdding = sc.nextInt();
+                sc.nextLine();
+                bookAddCount = BookAdding;
 
-
-                if(!sc.hasNextInt())
+                if(BookAdding > slot_count)
                 {
-                    System.out.println("Please enters only numbers.");
-                    sc.nextLine();
+                    System.out.println("Invalid Input! You Can Only Add Up To [ " + slot_count + " ] Books.Please Enter Again\n");
+                }
+                else if(BookAdding == 0 || BookAdding < 0)
+                {
+                    System.out.println(">> At Least One Book Must Be Entered. Adding Zero Books Is Not Allowed!! <<\n");
                 }
                 else
                 {
-                    BookAdding = sc.nextInt();
-                    sc.nextLine();
-                    bookAddCount = BookAdding;
-
-                    if(BookAdding > slot_count)
-                    {
-                        System.out.println("!You Can Only Add Up To [ " + slot_count + " ] Books.Please Enter Again\n");
-                    }
-                    else if(BookAdding == 0 || BookAdding < 0)
-                    {
-                        System.out.println(">> At Least One Book Must Be Entered. Adding Zero Books Is Not Allowed!! <<\n");
-                    }
-                    else
-                    {
-                        invalidInput = true;
-                    }
+                    invalidInput = true;
                 }
-
             }
 
             int count = 0;
@@ -300,70 +282,62 @@ class LibraryTransaction extends LibraryInventory
                 System.out.println(">> How Many Books Do You Want To Issue: ");
                 no_issueBook = sc.nextInt();
 
-                if(!sc.hasNextInt())
+                if(no_issueBook == 0 || no_issueBook < 0)
                 {
-                    System.out.println("Please enter number only.");
+                    System.out.println("Invalid! At Least One Book Must Be Issued");
+                    System.out.println("=================================");
+                }
+                else if (no_issueBook > slot)
+                {
+                    System.out.println("You Cannot Issue More Books Than The Allowed Limit.\n");
                     sc.nextLine();
                 }
                 else
                 {
-                    if(no_issueBook == 0 || no_issueBook < 0)
+                    for (int i = 0; i < no_issueBook; i++)
                     {
-                        System.out.println("Invalid! At Least One Book Must Be Issued");
-                        System.out.println("=================================");
-                    }
-                    else if (no_issueBook > slot)
-                    {
-                        System.out.println("You Cannot Issue More Books Than The Allowed Limit.\n");
-                        sc.nextLine();
-                    }
-                    else
-                    {
-                        for (int i = 0; i < no_issueBook; i++)
+                        System.out.print("Enter The Number Of The Book To Issue: ");
+                        bookNo = sc.nextInt();
+
+                        if(bookNo < 1 || bookNo > book.length)
                         {
-                            System.out.print("Enter The Number Of The Book To Issue: ");
-                            bookNo = sc.nextInt();
+                            System.out.println("Invalid Number!");
+                            i--;
+                            continue;
+                        }
 
-                            if(bookNo < 1 || bookNo > book.length)
+                        if(book[bookNo - 1] == null)
+                        {
+                            System.out.println("No Book Exists At This Number.");
+                            i--;
+                            continue;
+                        }
+                        else if ( book[bookNo - 1].contains("(Issued)"))
+                        {
+                            System.out.println("This Book Is Already Issued!");
+                            i--;
+                            continue;
+                        }
+
+                        for (int j = 0; j < issueBook.length; j++)
+                        {
+                            if(issueBook[j] == null)
                             {
-                                System.out.println("Invalid Number!");
-                                i--;
-                                continue;
-                            }
+                                issueBook[j] = book[bookNo - 1];
+                                issueIndex[j] = bookNo - 1;
 
-                            if(book[bookNo - 1] == null)
-                            {
-                                System.out.println("No Book Exists At This Number.");
-                                i--;
-                                continue;
-                            }
-                            else if ( book[bookNo - 1].contains("(Issued)"))
-                            {
-                                System.out.println("This Book Is Already Issued!");
-                                i--;
-                                continue;
-                            }
-
-                            for (int j = 0; j < issueBook.length; j++)
-                            {
-                                if(issueBook[j] == null)
-                                {
-                                    issueBook[j] = book[bookNo - 1];
-                                    issueIndex[j] = bookNo - 1;
-
-                                    System.out.println("The Book Has Been Successfully Issued!");
-                                    book[bookNo - 1] = book[bookNo - 1] + "   (Issued)";
-                                    break;
-                                }
-
+                                System.out.println("The Book Has Been Successfully Issued!");
+                                book[bookNo - 1] = book[bookNo - 1] + "   (Issued)";
+                                break;
                             }
 
                         }
-                        sc.nextLine();
-                        break;
+
                     }
-                    System.out.println();
+                    sc.nextLine();
+                    break;
                 }
+                System.out.println();
             }
         }
         Pause();
@@ -411,61 +385,52 @@ class LibraryTransaction extends LibraryInventory
         System.out.println("=================================");
         System.out.println("-------- ISSUED BOOKS --------");
         System.out.println();
-
-        for (int i = 0; i < issuedBook.length; i++) {
-            if (issuedBook[i] == null || issuedBook[i].isEmpty()) {
+        for (int i = 0; i < issuedBook.length; i++)
+        {
+            if(issuedBook[i] == null || issuedBook[i].isEmpty())
+            {
                 continue;
-            } else {
-                System.out.println("Book " + (i + 1) + ": " + issuedBook[i]);
+            }
+            else
+            {
+                System.out.println("Book " + (i + 1)+": "+issuedBook[i]);
                 anyIssued = true;
             }
         }
 
-        if (!anyIssued) {
+
+        if(!anyIssued)
+        {
             System.out.println("------- No Book Issued -------");
             show = false;
         }
 
+
         System.out.println("=================================");
 
-        if (show) {
-            no_books = 0;
-
-            while (true) {
-                System.out.println("Enter How Many Books You Want To Return: ");
-
-                if (!sc.hasNextInt()) {
-                    System.out.println("Please enter only numbers.");
-                    sc.nextLine();
-                } else {
-                    no_books = sc.nextInt();
-                    sc.nextLine();
-                    if (no_books <= 0) {
-                        System.out.println("At least one book must be returned!");
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-            for (int i = 0; i < no_books; i++) {
-                System.out.println("Please Provide The Number Of The Book You Want To Return: ");
-                int temp = sc.nextInt();
-                int book_no = temp - 1;
-
-                int originalIndex = issueIndex[book_no];
-
-                book[originalIndex] = book[originalIndex].replace("(Issued)", "").trim();
-                issuedBook[book_no] = null;
-                issueIndex[book_no] = -1;
-
-                System.out.println("Book Returned Successfully: [ " + book[originalIndex] + " ]");
-                sc.nextLine();
-            }
-
-            Pause();
+        if(show)
+        {
+            System.out.println("Enter How Many Books You Want To Return: ");
+            no_books = sc.nextInt();
+            sc.nextLine();
         }
 
+        for (int i = 0; i < no_books; i++)
+        {
+            System.out.println("Please Provide The Number Of The Book You Want To Return: ");
+            int temp= sc.nextInt();
+            int book_no = temp - 1;
+
+            int originalIndex = issueIndex[book_no];
+
+            book[originalIndex] = book[originalIndex].replace("(Issued)","").trim();
+            issuedBook[book_no] = null;
+            issueIndex[book_no] = -1;
+
+            System.out.println("Book Returned Successfully: [ " + book[originalIndex] + " ]");
+            sc.nextLine();
+        }
+        Pause();
     }
 
 }
